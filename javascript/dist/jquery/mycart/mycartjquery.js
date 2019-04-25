@@ -28,6 +28,13 @@ $(function () {
     $.fn.clearCart();
   });
   $.fn.displayItems();
+
+
+  $("#checkout").click(function () {
+    if (myCart._totalQty > 0) {
+      window.open("checkout.html", "_self");
+    }
+  });
 });
 
 $.fn.displayItems = function () {

@@ -421,13 +421,13 @@
 		background-color: #e49012;
     }
     
-    /*The clear cart button has a light orange color*/
-	#clear {
+    /*The clear cart button and cancel checkout has a light orange color*/
+	#clear, #cancel {
 		background-color: #eba640;
 	}
     
-    /*Common attributes for both clear and checkoput buttons*/
-	#clear, #checkout {
+    /*Common attributes for clear, cancel and checkoput buttons*/
+	#clear, #checkout, #cancel {
         position: relative;
         width: 100%;
         padding: 1px;
@@ -440,13 +440,13 @@
     }
 
     /*Remove the shadow when clicked on*/
-	#clear:active, #checkout:active {
+	#clear:active, #checkout:active, #cancel:active {
         box-shadow: 0 0 0 0;
         cursor: pointer;
     }
 
     /*Change the curser to a pointer when hovered over*/
-	#clear:hover, #checkout:hover {
+	#clear:hover, #checkout:hover, #cancel:hover {
         cursor: pointer;
     }
 
@@ -1019,14 +1019,14 @@
 		    background-color: #e49012;
         }
     
-        /*The clear cart button has a light orange color*/
-	    #clear {
+        /*The clear cart button and cancel checkout has a light orange color*/
+	    #clear, #cancel {
             width: 100%;
 		    background-color: #eba640;
 	    }
     
         /*Common attributes for both clear and checkout buttons*/
-        #clear, #checkout {
+        #clear, #checkout, #cancel {
             position: relative;
             display: block;
             border-radius: 2px;
@@ -1037,7 +1037,7 @@
         }
 
         /*Remove the shadow when clicked on*/
-	    #clear:active, #checkout:active {
+	    #clear:active, #checkout:active, #cancel:active {
             box-shadow: 0 0 0 0;
         }
     
