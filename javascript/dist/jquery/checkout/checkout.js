@@ -13,7 +13,8 @@ var myCart;     // holds the shopping cart data
 var itemsArray; // used for holding the json object foir items info
 
 var formData;
-var contries;
+var countries;
+var countryCode;
 var provinces;
 var states;
 var cities;
@@ -56,7 +57,7 @@ $.fn.loadJsonFiles = function () {
         $("#city").append("<option value=\"" + "Select One" + "\">" + "Select One" + "</option>");
         $.fn.loadLocation("#city", "json/countriescities.json", $("#country").val());
         if ($("#country").val() == "United States") {
-            $.fn.loadLocation("#province", "json/states.json", null);
+            states = $.fn.loadLocation("#province", "json/states.json", null);
         } else if ($("#country").val() == "Canada") {
             $.fn.loadLocation("#province", "json/province.json", null);
         } else {
@@ -74,7 +75,7 @@ $.fn.loadLocation = function (id, fileName, country) {
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4 && xhr.status == 200) {
                 // read the response
-                entries = JSON.parse(xhr.responseText);
+                var entries = JSON.parse(xhr.responseText);
 
                 if (country) {
                     // retrieve the country's cities from countriescities.json
@@ -86,6 +87,11 @@ $.fn.loadLocation = function (id, fileName, country) {
                     });
 
                 } else {
+
+                    // this is needed for the country code in the API
+                    if (id == "#country") {
+                        countries = entries;
+                    }
 
                     $(id).empty();
                     $(id).append("<option value=\"" + "Select One" + "\">" + "Select One" + "</option>");
@@ -158,7 +164,6 @@ $.fn.processOrder = function () {
                 // send the order via paypal API
                 $.fn.sendOrder();
             }
-            //console.log(items);
         };
 
     } catch (exception) {
@@ -194,10 +199,10 @@ $.fn.sendOrder = function () {
                     "address": {
                         "address_line_1": $("#checkoutform #line1").val(),
                         "address_line_2": $("#checkoutform #line2").val(),
-                        "admin_area_2": "Ledeuc", //"\"" + $("#checkoutform #city").val() + "\"",
+                        "admin_area_2": $("#checkoutform #city").val(),
                         "admin_area_1": $("#checkoutform #province").val(),
                         "postal_code": $("#checkoutform #zip").val(),
-                        "country_code": "CA"//"\"" + $("#checkoutform #country").val() + "\""
+                        "country_code": countries[$("#checkoutform #country").val()].code
                     },
                 },
                 "purchase_units": [
@@ -221,7 +226,7 @@ $.fn.sendOrder = function () {
                         "items": itemsArray,
                         "shipping": {
                             "name": {
-                                "full_name": "\"" + $("#checkoutform #first").val() + " " + $("#checkoutform #last").val() + "\""
+                                "full_name": $("#checkoutform #first").val() + " " + $("#checkoutform #last").val()
                             },
                             "option": {
                                 "shipping_option": {
@@ -235,12 +240,12 @@ $.fn.sendOrder = function () {
                                     "selected": "true",
                                 },
                                 "address": {
-                                    "address_line_1": "\"" + $("#checkoutform #line1").val() + "\"",
-                                    "address_line_2": "\"" + $("#checkoutform #line2").val() + "\"",
-                                    "admin_area_2": "Leduc",//"\"" + $("#checkoutform #city").val() + "\"",
-                                    "admin_area_1": "\"" + $("#checkoutform #province").val() + "\"",
-                                    "postal_code": "\"" + $("#checkoutform #zip").val() + "\"",
-                                    "country_code": "CA"//"\"" + $("#checkoutform #country").val() + "\""
+                                    "address_line_1": $("#checkoutform #line1").val(),
+                                    "address_line_2": $("#checkoutform #line2").val(),
+                                    "admin_area_2": $("#checkoutform #city").val(),
+                                    "admin_area_1": $("#checkoutform #province").val(),
+                                    "postal_code": $("#checkoutform #zip").val(),
+                                    "country_code": countries[$("#checkoutform #country").val()].code
                                 },
                             }
                         },
