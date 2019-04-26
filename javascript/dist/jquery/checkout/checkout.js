@@ -12,23 +12,33 @@ var xhr;        // holds the XMLHttpRequest object
 var myCart;     // holds the shopping cart data
 var itemsArray; // used for holding the json object foir items info
 
+var formData;
+var contries;
+var provinces;
+var states;
+var cities;
+
+
 /*
 * This function is fired after the document is ready
 */
 $(function () {
+    // load the json files
+    $.fn.loadJsonFiles();
+
     // load the shopping cart object
     myCart = new Cart();
     myCart.loadCart(JSON.parse(localStorage.getItem("mycart")));
-
     // when the continue button is clicked process the order bt
     // calling the paypal API
     $("#checkout").click(function () {
         // clear the old elements
         $("#checkout").empty();
         // add a prompt text
-        $("#checkout").append("<p></p>").text("Please choose your payment method").css("text-align", "center");
+        $("#checkout").append("<p>Please choose your payment method</p>").css("text-align", "center");
         // add the paypal checkout button
-        $("#checkout").append("<div></div>").attr("id", "paypal-button-container");
+        $("#checkout").append("<div></div>");
+        $("#checkout div").attr("id", "paypal-button-container");
         $.fn.processOrder();
     });
 
@@ -37,6 +47,61 @@ $(function () {
         window.open("Cart.html", "_self");
     });
 });
+
+$.fn.loadJsonFiles = function () {
+    $.fn.loadLocation("#country", "json/countrynamecode.json", null);
+
+    $("#country").blur(function () {
+        $("#city").empty();
+        $("#city").append("<option value=\"" + "Select One" + "\">" + "Select One" + "</option>");
+        $.fn.loadLocation("#city", "json/countriescities.json", $("#country").val());
+        if ($("#country").val() == "United States") {
+            $.fn.loadLocation("#province", "json/states.json", null);
+        } else if ($("#country").val() == "Canada") {
+            $.fn.loadLocation("#province", "json/province.json", null);
+        } else {
+            $("#province").empty();
+            $("#province").append("<option value=\"" + "Select One" + "\">" + "Select One" + "</option>");
+        }
+    });
+
+};
+
+$.fn.loadLocation = function (id, fileName, country) {
+    try {
+        var xhr = new XMLHttpRequest();
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                // read the response
+                entries = JSON.parse(xhr.responseText);
+
+                if (country) {
+                    // retrieve the country's cities from countriescities.json
+                    entries = entries[country];
+                    $(id).empty();
+                    $(id).append("<option value=\"" + "Select One" + "\">" + "Select One" + "</option>");
+                    entries.forEach(function (entry) {
+                        $(id).append("<option value=\"" + entry + "\">" + entry + "</option>");
+                    });
+
+                } else {
+
+                    $(id).empty();
+                    $(id).append("<option value=\"" + "Select One" + "\">" + "Select One" + "</option>");
+                    entries.forEach(function (entry) {
+                        $(id).append("<option value=\"" + entry.name + "\">" + entry.name + "</option>");
+                    });
+                }
+            }
+        };
+    } catch (exception) {
+        alert("Something went wrong");
+    }
+
+    xhr.open("GET", fileName, true);
+    xhr.send(null);
+}
 
 /*
 * Processes the customer order
@@ -122,24 +187,17 @@ $.fn.sendOrder = function () {
                 "intent": "CAPTURE",
                 "payer": {
                     "name": {
-                        "given_name": "zakaria",
-                        "surname": "bakkal"
+                        "given_name": $("#checkoutform #first").val(),
+                        "surname": $("#checkoutform #last").val()
                     },
-                    "email_address": "bzakki@hotmail.com",
-                    "phone": {
-                        "phone_type": "HOME",
-                        "phone_number": {
-                            "national_number": "2345678967"
-                        }
-                    },
-                    "birth-date": "11-29-1981",
+                    "email_address": $("#checkoutform #email").val(),
                     "address": {
-                        "address_line_1": "payer address 1",
-                        "address_line_2": "payer address 2",
-                        "admin_area_2": "payer city",
-                        "admin_area_1": "payer province",
-                        "postal_code": "payer zip",
-                        "country_code": "CA"
+                        "address_line_1": $("#checkoutform #line1").val(),
+                        "address_line_2": $("#checkoutform #line2").val(),
+                        "admin_area_2": "Ledeuc", //"\"" + $("#checkoutform #city").val() + "\"",
+                        "admin_area_1": $("#checkoutform #province").val(),
+                        "postal_code": $("#checkoutform #zip").val(),
+                        "country_code": "CA"//"\"" + $("#checkoutform #country").val() + "\""
                     },
                 },
                 "purchase_units": [
@@ -163,7 +221,7 @@ $.fn.sendOrder = function () {
                         "items": itemsArray,
                         "shipping": {
                             "name": {
-                                "full_name": "ship to me"
+                                "full_name": "\"" + $("#checkoutform #first").val() + " " + $("#checkoutform #last").val() + "\""
                             },
                             "option": {
                                 "shipping_option": {
@@ -172,17 +230,17 @@ $.fn.sendOrder = function () {
                                     "type": "SHIPPING",
                                     "amount": {
                                         "currency_code": "CA",
-                                        "value": ""
+                                        "value": "0"
                                     },
                                     "selected": "true",
                                 },
                                 "address": {
-                                    "address_line_1": "169 104 west haven",
-                                    "address_line_2": "",
-                                    "admin_area_2": "Leduc",
-                                    "admin_area_1": "Alberta",
-                                    "postal_code": "T9E0N9",
-                                    "country_code": "CA"
+                                    "address_line_1": "\"" + $("#checkoutform #line1").val() + "\"",
+                                    "address_line_2": "\"" + $("#checkoutform #line2").val() + "\"",
+                                    "admin_area_2": "Leduc",//"\"" + $("#checkoutform #city").val() + "\"",
+                                    "admin_area_1": "\"" + $("#checkoutform #province").val() + "\"",
+                                    "postal_code": "\"" + $("#checkoutform #zip").val() + "\"",
+                                    "country_code": "CA"//"\"" + $("#checkoutform #country").val() + "\""
                                 },
                             }
                         },

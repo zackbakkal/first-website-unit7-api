@@ -78,53 +78,74 @@
     <div id="main">
         <h2>Check out</h2>
         <!-- check out form -->
-        <form id="checkoutform">
-            <label>Given Name:
-                <input type="text" name="given_name" max="140" tabindex="1" autofocus required><br>
-            </label>
-            <label>Surname:
-                <input type="text" name="surname" max="140" required><br>
-            </label>
-            <label>Email:
-                <input type="email" name="email" required><br>
-            </label>
-            <label>Phone:<br>
-                <label>Contry code:
-                    <input type="text"><br>
+        <form id="checkoutform" method="post">
+            <div id="name">
+                <p>Name</p><br>
+                <label>First<br>
+                    <input id="first" type="text" name="given_name" max="140" tabindex="1" autofocus required><br>
                 </label>
-                <label>National Number:
-                    <input type="tel" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"><br>
-                </label>Extension:
-                <input type="text"><br>
-            </label>
-            <label>Address:<br>
-                <label>Line 1:
-                    <input type="text" max="300" required><br>
+                <label>Last<br>
+                    <input id="last" type="text" name="surname" max="140" required tabindex="2"><br>
                 </label>
-                <label>Line 2:
-                    <input type="text" max="120"><br>
+            </div>
+            <div id="contactinformation">
+                <label>Email<br>
+                    <input id="email" type="email" name="email" required tabindex="3"><br>
                 </label>
-                <label>City/Town:
-                    <input type="text" max="120" required><br>
-                </label>
-                <label>Province/State:
-                    <input type="text" max="300"><br>
-                </label>
-                <label>Postal Code:
-                    <input type="text" pattern="[0-9a-zA-Z]{5}"><br>
-                </label>
-            </label>
+            </div>
+            <div id="shippingaddress">
+                <p>Shipping address</p><br>
+                <div>
+                    <div id="streetaptzip">
+                        <label>Street address<br>
+                            <input id="line1" type="text" max="300" required tabindex="4"><br>
+                        </label>
+                        <label>Apt., ste., bldg.<br>
+                            <input id="line2" type="text" max="120" tabindex="5"><br>
+                        </label>
+                        <label>Zip code<br>
+                            <input id="zip" type="text" pattern="[0-9a-zA-Z]{5}" tabindex="6"><br>
+                        </label>
+                    </div>
+                    <div id="countryprovincecity">
+                        <label>country
+                            <select id="country" tabindex="7">
+                                <option value="Select one">Select One</option>
+                            </select>
+                        </label><br>
+                        <label>Province/State
+                            <select id="province" tabindex="8">
+                                <option value="Select One">Select One</option>
+                            </select>
+                        </label><br>
+                        <label>City
+                            <select id="city" tabindex="9">
+                                <option value="Select One">Select One</option>
+                            </select>
+                        </label><br>
+                    </div>
+                </div>
+            </div>
 
-
+            <div id="controls" class="clearfix">
+                <div id="checkout" class="clearfix" tabindex="12">
+                    <input value="Continue" id="continue">
+                </div>
+                <div id="cancel" class="clearfix" tabindex="13">
+                    <input value="Cancel" id="cancelcheckout">
+                </div>
+            </div>
         </form>
+        <!--
         <div id="controls" class="clearfix">
-            <div id="checkout" class="clearfix">
+            <div id="checkout" class="clearfix" tabindex="12">
                 <p id="continue">Continue</p>
             </div>
-            <div id="cancel" class="clearfix">
+            <div id="cancel" class="clearfix" tabindex="13">
                 <p>Cancel</p>
             </div>
         </div>
+    -->
     </div>
 
     <footer class="clearfix">

@@ -407,14 +407,41 @@
 		position: relative;
 		width: 100%;
     }
+
+    /***************
+    * checkoutform *
+    ***************/
+
+    #checkoutform #name, #checkoutform #contactinformation, #checkoutform #shippingaddress {
+        border: solid lightgray 1px;
+        margin: 10px;
+        padding: 20px;
+    }
     
+    #checkoutform div label, #checkoutform div label select {
+        margin: 10px;
+        padding: 5px;
+        margin-left: 0;
+        padding-left: 0;
+    }
+
+    #checkoutform div p {
+        position: relative;
+        margin-left: 0;
+        padding-left: 0;
+        margin-top: 0;
+        padding-top: 0;
+        left: -25px;
+        font-weight: bold;
+    }
+
     /*The controls contains the checkout and clear cart buttons. We give it 50% of the
     containing element and shift it right.*/
     #controls {
 		width: 50%;
 		position: relative;
-		left: 50%;
-	}
+        left: 50%;
+    }
 
     /*The checkout button has a dark orange color*/
 	#checkout {
@@ -448,6 +475,38 @@
     /*Change the curser to a pointer when hovered over*/
 	#clear:hover, #checkout:hover, #cancel:hover {
         cursor: pointer;
+        box-shadow: 0 0 5px 2px #0026ff;
+    }
+
+    #checkout input {
+        width: 100%;
+        background-color: #e49012;
+        border-style: none;
+        padding: 1px;
+        margin: 10px;
+        margin-left: 0;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    #cancel input {
+        width: 100%;
+        background-color: #eba640;
+        border-style: none;
+        padding: 1px;
+        margin: 10px;
+        margin-left: 0;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    #checkout input:hover, #cancelcheckout:hover {
+        cursor: pointer;
+    }
+
+    #checkout input:active, #cancelcheckout:active {
+        border-style: none;
+        box-shadow: 0 0 0 0;
     }
 
     /**************
@@ -1006,6 +1065,14 @@
             width: 100%;
         }
 
+        /***************
+        * checkoutform *
+        ***************/
+
+        #checkoutform div {
+            border: solid lightgray 1px;
+        }
+
         /*The controls contains the checkout and clear cart buttons. We give it 100% of the
         containing element*/
         #controls {
@@ -1045,8 +1112,38 @@
         #controls div p {
             font-size: 1em;
         }
-        
 
+        #checkout input {
+            width: 100%;
+            background-color: #e49012;
+            border-style: none;
+            padding: 1px;
+            margin: 10px;
+            margin-left: 0;
+            text-align: center;
+            font-weight: bold;
+        }
+    
+        #cancel input {
+            width: 100%;
+            background-color: #eba640;
+            border-style: none;
+            padding: 1px;
+            margin: 10px;
+            margin-left: 0;
+            text-align: center;
+            font-weight: bold;
+        }
+    
+        #checkout input:hover, #cancelcheckout:hover {
+            cursor: pointer;
+        }
+    
+        #checkout input:active, #cancelcheckout:active {
+            border-style: none;
+            box-shadow: 0 0 0 0;
+        }
+        
         /**************
         * contactinfo *
         **************/
