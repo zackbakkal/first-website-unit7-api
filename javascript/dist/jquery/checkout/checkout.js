@@ -8,16 +8,9 @@
  */
 
 var items;      // holds the items info
-var xhr;        // holds the XMLHttpRequest object
 var myCart;     // holds the shopping cart data
-var itemsArray; // used for holding the json object foir items info
 
-var formData;
-var countries;
-var countryCode;
-var provinces;
-var states;
-var cities;
+var chosenCountryCode;
 
 
 /*
@@ -30,17 +23,24 @@ $(function () {
     // load the shopping cart object
     myCart = new Cart();
     myCart.loadCart(JSON.parse(localStorage.getItem("mycart")));
-    // when the continue button is clicked process the order bt
+    // when the continue button is clicked process the order by
     // calling the paypal API
-    $("#checkout").click(function () {
-        // clear the old elements
-        $("#checkout").empty();
-        // add a prompt text
-        $("#checkout").append("<p>Please choose your payment method</p>").css("text-align", "center");
-        // add the paypal checkout button
-        $("#checkout").append("<div></div>");
-        $("#checkout div").attr("id", "paypal-button-container");
-        $.fn.processOrder();
+    $("#checkoutform").on("submit", function () {
+        // check if the use selected a country
+        if ($("#country").val()) {
+
+            // clear the old elements
+            $("#checkout").empty();
+            // add a prompt text
+            $("#checkout").append("<p></p>").text("Please choose your payment method").css("text-align", "center");
+            // add the paypal checkout button
+            $("#checkout").append("<div></div>");
+            $("#checkout div").attr("id", "paypal-button-container");
+            $.fn.processOrder();
+        } else {
+            $("#country").css("background-color", "red");
+        }
+        return false;
     });
 
     // if the cancel button is clicked return to shopping cart page
@@ -50,128 +50,134 @@ $(function () {
 });
 
 $.fn.loadJsonFiles = function () {
-    $.fn.loadLocation("#country", "json/countrynamecode.json", null);
+    $.fn.loadLocation("#country", "json/countrynames.json", null);
 
     $("#country").blur(function () {
-        $("#city").empty();
-        $("#city").append("<option value=\"" + "Select One" + "\">" + "Select One" + "</option>");
-        $.fn.loadLocation("#city", "json/countriescities.json", $("#country").val());
-        if ($("#country").val() == "United States") {
-            states = $.fn.loadLocation("#province", "json/states.json", null);
-        } else if ($("#country").val() == "Canada") {
-            $.fn.loadLocation("#province", "json/province.json", null);
+        console.log($("#country").val());
+        if ($("#country").val() && $("#country").val() != "Select One Pls") {
+            $(this).css("background-color", "white");
+            $("#city").empty();
+            $.fn.loadLocation("#city", "json/countriescities.json", $("#country").val());
+            if ($(this).val() == "United States") {
+                $.fn.loadLocation("#province", "json/states.json", null);
+            } else if ($(this).val() == "Canada") {
+                $.fn.loadLocation("#province", "json/province.json", null);
+            } else {
+                $("#province").empty();
+            }
+
+            // retrieve the contry code. This is important for
+            // the json object sent to paypal
+            $.ajax({
+                type: "GET",
+                url: "json/countrynamecode.json",
+                success: function (data) {
+                    chosenCountryCode = data[$("#country").val()];
+                },
+                error: function () {
+                    window.alert("Unable to process your payment at this moment, please try again later");
+                },
+                dataType: "json"
+            });
         } else {
-            $("#province").empty();
-            $("#province").append("<option value=\"" + "Select One" + "\">" + "Select One" + "</option>");
+            $(this).css("background-color", "red");
         }
     });
 
 };
 
 $.fn.loadLocation = function (id, fileName, country) {
-    try {
-        var xhr = new XMLHttpRequest();
 
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState == 4 && xhr.status == 200) {
-                // read the response
-                var entries = JSON.parse(xhr.responseText);
+    $.ajax({
+        type: "GET",
+        url: fileName,
+        success: function (data) {
 
-                if (country) {
-                    // retrieve the country's cities from countriescities.json
-                    entries = entries[country];
-                    $(id).empty();
-                    $(id).append("<option value=\"" + "Select One" + "\">" + "Select One" + "</option>");
-                    entries.forEach(function (entry) {
-                        $(id).append("<option value=\"" + entry + "\">" + entry + "</option>");
-                    });
+            if (country) {
+                // retrieve the country's cities from countriescities.json
+                data = data[country];
 
-                } else {
+                $(id).empty();;
+                data.forEach(function (entry) {
+                    $(id).append("<option value=\"" + entry + "\">" + entry + "</option>");
+                });
 
-                    // this is needed for the country code in the API
-                    if (id == "#country") {
-                        countries = entries;
-                    }
+            } else {
 
-                    $(id).empty();
-                    $(id).append("<option value=\"" + "Select One" + "\">" + "Select One" + "</option>");
-                    entries.forEach(function (entry) {
-                        $(id).append("<option value=\"" + entry.name + "\">" + entry.name + "</option>");
-                    });
-                }
+                // clear the section element content
+                $(id).empty();
+                // add an option message
+                $(id).append("<option>Select One Pls</option>");
+                // iterate through the entries and add an option element fro each of them
+                data.forEach(function (entry) {
+                    $(id).append("<option value=\"" + entry.name + "\">" + entry.name + "</option>");
+                });
             }
-        };
-    } catch (exception) {
-        alert("Something went wrong");
-    }
-
-    xhr.open("GET", fileName, true);
-    xhr.send(null);
+        },
+        error: function () {
+            window.alert("Unable to process your payment at this moment, please try again later");
+        },
+        dataType: "json"
+    });
 }
 
 /*
 * Processes the customer order
 */
 $.fn.processOrder = function () {
-    // retrieve items info to fill the order JSON object for the order
-    try {
-        xhr = new XMLHttpRequest();     // create the XMLHttpRequest object
 
-        // when the request is ready fire the fucntion
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState == 4 && xhr.status == 200) {
-                // read the response
-                var response = JSON.parse(xhr.responseText);
-                // used to track the end of each item
-                var counter = 0;
-                // holds the item info
-                items = "";
-                // generate items
-                myCart._rows.forEach(function (row) {
-                    // generate the items
-                    items += "{";
-                    items += "\"name\":" + "\"" + row._product._name + "\","
-                        + "\"unit_amount\":" + "{"
-                        + "\"currency_code\":" + "\"CAD\","
-                        + "\"value\":" + "\"" + row._product._price + "\"},"
-                        + "\"quantity\":" + "\"" + row._qty + "\",";
-                    switch (row._product._name) {
-                        case "Argan Oil":
-                            items += "\"description\":" + "\"" + response[0].description + "\","
-                                + "\"SKU\":" + "\"" + response[0].SKU + "\","
-                                + "\"category\":" + "\"" + response[0].category + "\"";
-                            break;
-                        case "Exfoliating Soap":
-                            items += "\"description\":" + "\"" + response[1].description + "\","
-                                + "\"SKU\":" + "\"" + response[1].SKU + "\","
-                                + "\"category\":" + "\"" + response[1].category + "\"";
-                            break;
-                        case "Lava Clay":
-                            items += "\"description\":" + "\"" + response[2].description + "\","
-                                + "\"SKU\":" + "\"" + response[2].SKU + "\","
-                                + "\"category\":" + "\"" + response[2].category + "\"";
-                            break;
-                    }
-                    items += "}";
-                    // just a way to figure when to add a comma
-                    counter++;
-                    if (counter < myCart._rows.length) {
-                        items += ",";
-                    }
+    $.ajax({
+        type: "GET",
+        url: "json/items.json",
+        success: function (data) {
 
-                });
+            // used to track the end of each item
+            var counter = 0;
+            // holds the item info
+            items = "";
+            // generate items
+            myCart._rows.forEach(function (row) {
+                // generate the items
+                items += "{";
+                items += "\"name\":" + "\"" + row._product._name + "\","
+                    + "\"unit_amount\":" + "{"
+                    + "\"currency_code\":" + "\"CAD\","
+                    + "\"value\":" + "\"" + row._product._price + "\"},"
+                    + "\"quantity\":" + "\"" + row._qty + "\",";
+                switch (row._product._name) {
+                    case "Argan Oil":
+                        items += "\"description\":" + "\"" + data[0].description + "\","
+                            + "\"SKU\":" + "\"" + data[0].SKU + "\","
+                            + "\"category\":" + "\"" + data[0].category + "\"";
+                        break;
+                    case "Exfoliating Soap":
+                        items += "\"description\":" + "\"" + data[1].description + "\","
+                            + "\"SKU\":" + "\"" + data[1].SKU + "\","
+                            + "\"category\":" + "\"" + data[1].category + "\"";
+                        break;
+                    case "Lava Clay":
+                        items += "\"description\":" + "\"" + data[2].description + "\","
+                            + "\"SKU\":" + "\"" + data[2].SKU + "\","
+                            + "\"category\":" + "\"" + data[2].category + "\"";
+                        break;
+                }
+                items += "}";
+                // just a way to figure when to add a comma
+                counter++;
+                if (counter < myCart._rows.length) {
+                    items += ",";
+                }
 
-                // send the order via paypal API
-                $.fn.sendOrder();
-            }
-        };
+            });
 
-    } catch (exception) {
-        alert("Something went wrong");
-    }
-
-    xhr.open("GET", "json/items.json", true);
-    xhr.send(null);
+            // send the order via paypal API
+            $.fn.sendOrder();
+        },
+        error: function () {
+            window.alert("Unable to process your payment at this moment, please try again later");
+        },
+        dataType: "json"
+    });
 };
 
 $.fn.sendOrder = function () {
@@ -184,25 +190,28 @@ $.fn.sendOrder = function () {
     paypal.Buttons({
         // create the order
         createOrder: function (data, actions) {
+            var dateCreated = new Date().toISOString();
+            var id = new Date().getTime();
+            console.log(dateCreated);
             // create order on localStorage
             var order = {
                 //The merchant intends to capture payment immediately after the customer makes a payment.
-                "create_time": "2019-04-24T19:58:01Z",
-                "id": "random",
+                "create_time": dateCreated,
+                "id": id,
                 "intent": "CAPTURE",
                 "payer": {
                     "name": {
-                        "given_name": $("#checkoutform #first").val(),
-                        "surname": $("#checkoutform #last").val()
+                        "given_name": $("#first").val(),
+                        "surname": $("#last").val()
                     },
-                    "email_address": $("#checkoutform #email").val(),
+                    "email_address": $("#email").val(),
                     "address": {
-                        "address_line_1": $("#checkoutform #line1").val(),
-                        "address_line_2": $("#checkoutform #line2").val(),
-                        "admin_area_2": $("#checkoutform #city").val(),
-                        "admin_area_1": $("#checkoutform #province").val(),
-                        "postal_code": $("#checkoutform #zip").val(),
-                        "country_code": countries[$("#checkoutform #country").val()].code
+                        "address_line_1": $("#line1").val(),
+                        "address_line_2": $("#line2").val(),
+                        "admin_area_2": $("#city").val(),
+                        "admin_area_1": $("#province").val(),
+                        "postal_code": $("#zip").val(),
+                        "country_code": chosenCountryCode
                     },
                 },
                 "purchase_units": [
@@ -240,12 +249,12 @@ $.fn.sendOrder = function () {
                                     "selected": "true",
                                 },
                                 "address": {
-                                    "address_line_1": $("#checkoutform #line1").val(),
-                                    "address_line_2": $("#checkoutform #line2").val(),
-                                    "admin_area_2": $("#checkoutform #city").val(),
-                                    "admin_area_1": $("#checkoutform #province").val(),
-                                    "postal_code": $("#checkoutform #zip").val(),
-                                    "country_code": countries[$("#checkoutform #country").val()].code
+                                    "address_line_1": $("#line1").val(),
+                                    "address_line_2": $("#line2").val(),
+                                    "admin_area_2": $("#city").val(),
+                                    "admin_area_1": $("#province").val(),
+                                    "postal_code": $("#zip").val(),
+                                    "country_code": chosenCountryCode
                                 },
                             }
                         },
@@ -254,9 +263,30 @@ $.fn.sendOrder = function () {
             };
 
             // store the order on the localStorage
-            localStorage.setItem("order", order);
+            localStorage.setItem("order", JSON.stringify(order));
             // Set up the transaction
             return actions.order.create(order);
+        },
+
+        onApprove: function (data, actions) {
+            // Capture the funds from the transaction
+            return actions.order.capture().then(function (details) {
+                // Show a success message to your buyer
+                alert('Transaction completed by ' + details.payer.name.given_name);
+                // clear the shopping cart
+                myCart.clear();
+                // redirect the customer to a order info page
+                window.open("approved.html", "_self");
+            });
+        },
+
+        onCancel: function (data) {
+            window.open("checkout.html", "_self");
+        },
+
+        onError: function (err) {
+            window.alert("Something went wrong, can't process your payment. Please try again later.");
         }
+
     }).render('#paypal-button-container');
 };

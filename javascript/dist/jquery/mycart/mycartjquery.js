@@ -14,6 +14,7 @@ var tableBody;
 var totalQty;
 var totalPrice;
 $(function () {
+  console.log(localStorage);
   // Retrieve the tableBody element
   // Retrive the totalqty element and set it to 0
   $("#totalqty").text("0");

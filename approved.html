@@ -16,9 +16,7 @@
     <script src="javascript/dist/jquery/mycart/row.js"></script>
     <script src="javascript/dist/jquery/mycart/cart.js"></script>
     <script src="javascript/dist/shoppingcart/dropdowncart/dropdowncart.js"></script>
-    <script
-        src="https://www.paypal.com/sdk/js?currency=CAD&client-id=AX7sb5iIJq4qiIyOtJZGG2wBd_POcg3hOyfE_q1-hbabQf8bydo5YoABl3Qshhwh-uUWn00QT8S35ERa"></script>
-    <script src="javascript/dist/jquery/checkout/checkout.js"></script>
+    <script src="javascript/dist/jquery/checkout/approved.js"></script>
 
     <title>K-Bree Cosmetics - Check Out</title>
 </head>
@@ -76,66 +74,48 @@
     </div>
 
     <div id="main">
-        <h2>Check out</h2>
-        <!-- check out form -->
-        <form id="checkoutform">
-            <div id="name">
-                <p>Name</p><br>
-                <label>First<br>
-                    <input id="first" type="text" name="given_name" max="140" tabindex="1" autofocus required><br>
-                </label>
-                <label>Last<br>
-                    <input id="last" type="text" name="surname" max="140" required tabindex="2" required><br>
-                </label>
+        <h2>Your order details</h2>
+        <div class="lightgrayborder">
+            <div class="orderdetails">
+                <label>ID:</label><label id="id"></label>
             </div>
-            <div id="contactinformation">
-                <label>Email<br>
-                    <input id="email" type="email" name="email" required tabindex="3"><br>
-                </label>
+            <div class="orderdetails">
+                <label>Total:</label><label id="total"></label>
             </div>
-            <div id="shippingaddress">
-                <p>Shipping address</p><br>
+        </div>
+        <br>
+        <div class="lightgrayborder">
+            <div>
+                <label class="bold">Shipping address</label><label id="shippingaddress"></label>
                 <div>
-                    <div id="streetaptzip">
-                        <label>Street address<br>
-                            <input id="line1" type="text" max="300" tabindex="4"><br>
-                        </label>
-                        <label>Apt., ste., bldg.<br>
-                            <input id="line2" type="text" max="120" tabindex="5"><br>
-                        </label>
-                        <label>Zip code<br>
-                            <input id="zip" type="text" tabindex="6"><br>
-                        </label>
+                    <div class="orderdetails">
+                        <label>Name:</label><label id="name"></label>
                     </div>
-                    <div id="countryprovincecity">
-                        <label>country
-                            <select id="country" tabindex="7" required>
-                                <option>Select One pls</option>
-                            </select>
-                        </label><br>
-                        <label>Province/State
-                            <select id="province" tabindex="8">
-                            </select>
-                        </label><br>
-                        <label>City
-                            <select id="city" tabindex="9">
-                            </select>
-                        </label><br>
+                    <div class="orderdetails">
+                        <label>Street address:</label><label id="line1"></label>
+                    </div>
+                    <div class="orderdetails">
+                        <label>Address line 2:</label><label id="line2"></label>
+                    </div>
+                    <div class="orderdetails">
+                        <label>Province/state:</label><label id="province"></label>
+                    </div>
+                    <div class="orderdetails">
+                        <label>City:</label><label id="city"></label>
+                    </div>
+                    <div class="orderdetails">
+                        <label>Zip code:</label><label id="zipcode"></label>
+                    </div>
+                    <div class="orderdetails">
+                        <label>Country:</label><label id="country"></label>
                     </div>
                 </div>
             </div>
-
-            <div id="controls" class="clearfix">
-                <div id="checkout" class="clearfix" tabindex="12">
-                    <input type="submit" value="Continue" id="continue">
-                </div>
-                <div id="cancel" class="clearfix" tabindex="13">
-                    <input type="reset" value="Cancel" id="cancelcheckout">
-                </div>
+            <div>
+                <p>Thanks you for shopping with us.</p>
             </div>
-        </form>
+        </div>
     </div>
-
     <footer class="clearfix">
         <div id="contactinfo">
             <ul>
