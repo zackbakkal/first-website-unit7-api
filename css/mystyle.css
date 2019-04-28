@@ -779,6 +779,11 @@
 	.round {
 		border-radius:10px;
     }
+
+    .centerpos {
+        position: relative;
+        left: 25%;
+    }
     
 }
 
@@ -789,6 +794,11 @@
         * {
             display: block;
             /*border: solid black 1px;*/
+        }
+
+        /*Hide the style on mobile divices*/
+        style {
+            display: none;
         }
     
         /***********************************************/
@@ -1335,5 +1345,10 @@
 
         .removeMe0:active, .removeMe1:hover,.removeMe2:hover {
             font-weight: bold;
+        }
+
+        .centerpos {
+            position: relative;
+            left: 25%;
         }
     }
