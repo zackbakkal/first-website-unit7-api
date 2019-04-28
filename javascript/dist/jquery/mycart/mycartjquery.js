@@ -14,7 +14,7 @@ var tableBody;
 var totalQty;
 var totalPrice;
 $(function () {
-  console.log(localStorage);
+
   // Retrieve the tableBody element
   // Retrive the totalqty element and set it to 0
   $("#totalqty").text("0");
@@ -30,7 +30,7 @@ $(function () {
   });
   $.fn.displayItems();
 
-
+  // when the customer clicks on the checkout button the checkout page is opened, on the condition that the shopping cart has items in it
   $("#checkout").click(function () {
     if (myCart._totalQty > 0) {
       window.open("checkout.html", "_self");
@@ -38,15 +38,19 @@ $(function () {
   });
 });
 
+/*
+* Displays items on the shopping cart
+*/
 $.fn.displayItems = function () {
   // remove any children of tableBody element
   if ($("#tablebody").children().length > 0) {
     $("#tablebody").empty();
-  } // reset totals
+  }
 
-
+  // reset totals
   $("#totalqty").text("0");
   $("#totalprice").text("0.00");
+
   // check if the cart has any products added to it
   if (myCart._totalQty > 0) {
     // used to assign class names and ids to table rows

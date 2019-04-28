@@ -59,7 +59,7 @@ $(function () {
     $("#carttotalqty").text(myCart.totalQty);
 
     // show an idicator that an item is added to the cart
-    $.fn.indicateITemAdded();
+    $.fn.indicateItemAdded();
   });
 });
 
@@ -67,7 +67,7 @@ $(function () {
 * I left this function written in javascript because
 * it seems faster than when it is implemented using JQuery
 */
-$.fn.indicateITemAdded = function () {
+$.fn.indicateItemAdded = function () {
   // create an indicator element, with a +1 text inside it
   var indicator = document.createElement("span");
   indicator.setAttribute("id", "indicator");

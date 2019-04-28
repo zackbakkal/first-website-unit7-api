@@ -466,16 +466,21 @@
 		text-align: center;
     }
 
-    /*Remove the shadow when clicked on*/
-	#clear:active, #checkout:active, #cancel:active {
-        box-shadow: 0 0 0 0;
-        cursor: pointer;
-    }
-
     /*Change the curser to a pointer when hovered over*/
 	#clear:hover, #checkout:hover, #cancel:hover {
         cursor: pointer;
         box-shadow: 0 0 5px 2px #0026ff;
+    }
+
+    /*Remove the shadow when clicked on*/
+	#clear:active, #checkout:active {
+        box-shadow: 0 0 0 0;
+        cursor: pointer;
+    }
+
+    #cancel:active {
+        box-shadow: 0 0 0 0;
+        cursor: pointer;
     }
 
     #checkout input {

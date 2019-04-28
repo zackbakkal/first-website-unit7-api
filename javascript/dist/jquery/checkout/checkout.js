@@ -9,9 +9,8 @@
 
 var items;      // holds the items info
 var myCart;     // holds the shopping cart data
-
+// holds The two-character ISO 3166-1 code that identifies the country or region
 var chosenCountryCode;
-
 
 /*
 * This function is fired after the document is ready
@@ -26,7 +25,7 @@ $(function () {
     // when the continue button is clicked process the order by
     // calling the paypal API
     $("#checkoutform").on("submit", function () {
-        // check if the use selected a country
+        // check if the user selected a country
         if ($("#country").val()) {
 
             // clear the old elements
@@ -35,9 +34,12 @@ $(function () {
             $("#checkout").append("<p></p>").text("Please choose your payment method").css("text-align", "center");
             // add the paypal checkout button
             $("#checkout").append("<div></div>");
+            // give the paypal checkout button an id
             $("#checkout div").attr("id", "paypal-button-container");
+            // process the order
             $.fn.processOrder();
         } else {
+            // the user did not provide a country
             $("#country").css("background-color", "red");
         }
         return false;
@@ -49,20 +51,37 @@ $(function () {
     });
 });
 
+/*
+* Loads the necessary json files for the checkout form
+*/
 $.fn.loadJsonFiles = function () {
+    // load the country names json file and add it to
+    // the element country
     $.fn.loadLocation("#country", "json/countrynames.json", null);
 
+    // when the cursor is outside the country input box
+    // we load the json file of privinces and cities
+    // and add the corresponding ones
     $("#country").blur(function () {
-        console.log($("#country").val());
+        // check if the user has chosen a country
         if ($("#country").val() && $("#country").val() != "Select One Pls") {
+            // change the country box background color to white
             $(this).css("background-color", "white");
+            // remove the cities list from the city box
             $("#city").empty();
+            // load the json file of cities corresponding to the
+            // chosen country
             $.fn.loadLocation("#city", "json/countriescities.json", $("#country").val());
+            // if the country is united states we load the json file of 
+            // states, otherwise we load the json file of provinces. Other 
+            // countries are not supported yet
             if ($(this).val() == "United States") {
                 $.fn.loadLocation("#province", "json/states.json", null);
             } else if ($(this).val() == "Canada") {
                 $.fn.loadLocation("#province", "json/province.json", null);
             } else {
+                // the country chosen is not the US nor CA so we just
+                // empty the province/state box
                 $("#province").empty();
             }
 
@@ -86,6 +105,13 @@ $.fn.loadJsonFiles = function () {
 
 };
 
+/*
+* Loads a json file named fileName and adds its content
+* as option elements to the selection element with the 
+* id attribut given as argument. The third argument is
+* given when we want to test if we are loading cities
+* or countries.
+*/
 $.fn.loadLocation = function (id, fileName, country) {
 
     $.ajax({
@@ -93,6 +119,7 @@ $.fn.loadLocation = function (id, fileName, country) {
         url: fileName,
         success: function (data) {
 
+            // check if we are loading cities
             if (country) {
                 // retrieve the country's cities from countriescities.json
                 data = data[country];
@@ -101,7 +128,7 @@ $.fn.loadLocation = function (id, fileName, country) {
                 data.forEach(function (entry) {
                     $(id).append("<option value=\"" + entry + "\">" + entry + "</option>");
                 });
-
+                // otherwise we are loading countries
             } else {
 
                 // clear the section element content
@@ -114,6 +141,7 @@ $.fn.loadLocation = function (id, fileName, country) {
                 });
             }
         },
+
         error: function () {
             window.alert("Unable to process your payment at this moment, please try again later");
         },
@@ -180,6 +208,9 @@ $.fn.processOrder = function () {
     });
 };
 
+/*
+* Send the order for payment
+*/
 $.fn.sendOrder = function () {
 
     // tranform the items to a JSON object
@@ -190,9 +221,10 @@ $.fn.sendOrder = function () {
     paypal.Buttons({
         // create the order
         createOrder: function (data, actions) {
+            // this is used to give the order an id
             var dateCreated = new Date().toISOString();
+            // this is used to give the order a date
             var id = new Date().getTime();
-            console.log(dateCreated);
             // create order on localStorage
             var order = {
                 //The merchant intends to capture payment immediately after the customer makes a payment.
@@ -224,7 +256,6 @@ $.fn.sendOrder = function () {
                                     "currency_code": "CAD",
                                     "value": `${myCart._totalPrice}`
                                 }
-
                             }
                         },
                         "payee": {
@@ -239,8 +270,8 @@ $.fn.sendOrder = function () {
                             },
                             "option": {
                                 "shipping_option": {
-                                    "id": "",
-                                    "label": "",
+                                    "id": id,
+                                    "label": "local",
                                     "type": "SHIPPING",
                                     "amount": {
                                         "currency_code": "CA",
@@ -268,6 +299,7 @@ $.fn.sendOrder = function () {
             return actions.order.create(order);
         },
 
+        // when the order is approved and payed for
         onApprove: function (data, actions) {
             // Capture the funds from the transaction
             return actions.order.capture().then(function (details) {
@@ -280,10 +312,12 @@ $.fn.sendOrder = function () {
             });
         },
 
+        // when the checkout is cancled return tot he checkout page
         onCancel: function (data) {
             window.open("checkout.html", "_self");
         },
 
+        // when an error is encountered
         onError: function (err) {
             window.alert("Something went wrong, can't process your payment. Please try again later.");
         }
